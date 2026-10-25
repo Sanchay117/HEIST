@@ -1,0 +1,15 @@
+{
+  "name": "heist-twitch",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A cooperative Twitch escape room. The streamer has the controls. Chat has the clues.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "dev": "node --env-file-if-exists=.env --watch server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check server.mjs && node --check lib/engine.mjs && node --check lib/twitch.mjs && node --check public/app.js"
+  },
+  "license": "MIT"
+}
