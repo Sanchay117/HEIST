@@ -22,7 +22,7 @@ Requires **Node.js 24 or newer**. There are no runtime package dependencies and 
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000), create a mission, and share the crew link. Use separate browsers or independent browser profiles to try different roles. Tabs and private windows that share storage may reuse the same crew session. Use the host's explicit demo crew controls to rehearse alone; demo messages are labeled and are not live Twitch activity.
+Open [http://localhost:3000](http://localhost:3000). **Begin heist** or **Assemble your crew** creates a rehearsal with anonymous role selection and voting. Use separate browsers/profiles to try different rehearsal roles, or the explicit demo crew controls to rehearse alone. Demo messages are labeled. **Create live mission** starts a separate mission where companion dossiers and votes require chat-code pairing to a verified Twitch account. Mission mode cannot be changed after creation.
 
 ```sh
 npm test
@@ -30,7 +30,9 @@ npm test
 
 `npm run check` validates the JavaScript sources. The automated suite covers the game rules, 100 seeded full heists, private state projections, API access controls, live updates, and the Twitch protocol with mocked Twitch services. The optional `test/browser-smoke.mjs` exercises a complete game with three independent real-browser crew sessions, mobile views, and the OBS overlay. It requires Playwright and a compatible Chromium browser; its header documents the environment variables. Screenshots and the browser report are written to the ignored `artifacts/browser/` directory.
 
-All fonts and camera graphics are bundled or drawn locally. The rehearsal and browser crew experience work without an external service.
+The optional `test/pairing-browser.mjs` uses the same Playwright configuration, starts its own local HTTP server with mocked Twitch transport, and checks pending/confirmed pairing, multiple browsers, shared voting, disconnection, expiry, and a full solo demo. Run `node test/pairing-browser.mjs`; its report and screenshots go to `artifacts/pairing-browser/`. The test-only fixture is not an endpoint or authentication bypass in the application.
+
+All fonts and camera graphics are bundled or drawn locally. Rehearsal works without an external service; live companion pairing requires a connected Twitch bridge.
 
 ## Views
 
@@ -51,8 +53,19 @@ The local game works without a Twitch account. The optional bridge connects to t
 1. [Register an application with Twitch](https://dev.twitch.tv/docs/authentication/register-app/) and note its client ID.
 2. Obtain a **user access token for the broadcaster**, issued for that same client ID, with `user:read:chat`. Add `user:write:chat` if you want command replies sent to Twitch chat. For local testing, register `http://localhost:3000` as the OAuth redirect, run `twitch configure` with the application's client ID and secret, then `twitch token --user-token --scopes "user:read:chat user:write:chat"`. **Generate the token before starting HEIST:** the CLI callback also uses port 3000. HEIST itself needs the client ID and user access token, not the client secret or refresh token.
 3. Copy `.env.example` to `.env` and set `TWITCH_CLIENT_ID` and `TWITCH_ACCESS_TOKEN`. Keep `.env` private. Restart the server after changing environment settings.
-4. Create a room and use the host's Twitch connection control. A configured token alone does not mean the bridge is connected; check the connection status.
-5. In your channel's chat, try `!heist`, `!clue`, and `!vote OPTION`. Use an option ID displayed by the current puzzle, such as a wire or exit ID. During the lock stage, a four-digit code is also a valid vote. Votes advise the streamer; they do not submit or solve a puzzle. Twitch chat identities and browser crew sessions are separate; select your chat-assigned role when joining in the browser if you want matching clues.
+4. Choose **Create live mission**, then **Broadcast setup → Connect Twitch**. A configured token alone does not mean the bridge is connected; wait for the connected channel name. Rehearsal rooms cannot connect Twitch or be promoted to live; create a fresh live room instead.
+5. Share **Invite your crew**. A viewer opens `/crew/ROOM`, selects **Get pairing code**, sends the displayed `!link ROOM-CODE` command in your Twitch chat, then returns to the companion and selects **Confirm account** after checking the account name. No private dossier or companion vote is available before confirmation. Pairing works with `user:read:chat`; write permission is optional because confirmation arrives through the companion, not a bot reply.
+6. In chat, try `!heist`, `!clue`, and `!vote OPTION`. Chat-only viewers can participate without opening the companion. Use an option ID displayed by the current puzzle, such as a wire or exit ID. During the lock stage, a four-digit code is also a valid vote. Votes advise the streamer; they do not submit or solve a puzzle. Chat and every confirmed browser use the same `twitch:<user ID>` participant: one role and one latest vote per account per stage.
+
+### Pairing rules
+
+- Codes contain the mission ID and 80 bits from Node's cryptographic random generator, expire after two minutes, and are consumed by the first valid Twitch claim. Browser confirmation must also occur before expiry. Codes are not included in public mission state or comms; the viewer's linking command is still visible in Twitch chat.
+- A live role is assigned once on the server. Chat-first and companion-first joins both reuse that account's participant. Opening another browser and linking the same account adds no extra member or vote. The companion shows the account name and shared vote.
+- A browser already linked to an account cannot request a replacement code or be silently linked to another account. There is no account-switch control; use a separate browser profile for a different account. Pending viewers can reject an unexpected account and request a new code. Never send a pairing code supplied by someone else.
+- Link attempts are limited to five per Twitch account and 60 per mission per minute. Code issuance is limited to three per browser session and 20 per IP per minute; session capacity is bounded. These in-memory limits reset on server restart.
+- A disconnected bridge shows pairing unavailable. New codes/confirmations are blocked until reconnection. Existing confirmed companion sessions retain their identity and may continue voting; pending codes still expire on schedule.
+- Mission reset invalidates unconfirmed codes/claims and clears votes, while retaining confirmed identities and roles. Server restart clears all rooms and sessions. Anonymous joins, role selection, and demo participants are confined to rehearsal.
+- This enforces one vote per Twitch account, not one vote per human owning multiple accounts. Real Twitch pairing, remote viewer reachability, and OBS broadcast remain separate verification steps.
 
 The bridge validates the token, identifies its owner, and subscribes to `channel.chat.message` using EventSub WebSockets. The broadcaster and reading user are the same account. API credentials stay on the server. Tokens must be replaced when expired or revoked; this starter does not provide an OAuth onboarding and refresh-token service.
 

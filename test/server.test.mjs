@@ -6,7 +6,8 @@ import { createServer } from '../server.mjs';
 import { createTwitchBridge, isTwitchReconnectUrl } from '../lib/twitch.mjs';
 
 async function start(t, options = {}) {
-  const server = createServer({ twitchOptions: { clientId: '', accessToken: '' }, ...options });
+  const { mode = 'rehearsal', ...serverOptions } = options;
+  const server = createServer({ twitchOptions: { clientId: '', accessToken: '' }, ...serverOptions });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   t.after(() => new Promise((resolve) => { server.close(resolve); server.closeAllConnections(); }));
@@ -18,7 +19,7 @@ async function start(t, options = {}) {
     }, body: body === undefined ? undefined : JSON.stringify(body) });
     return { status: response.status, body: await response.json(), headers: response.headers };
   }
-  const created = await call('/api/rooms', { body: {} });
+  const created = await call('/api/rooms', { body: { mode } });
   assert.equal(created.status, 201);
   return { server, base, call, ...created.body };
 }
@@ -184,7 +185,7 @@ test('Twitch rejects unsafe reconnect addresses and invalid scope before going l
 test('Twitch chat reaches the mission with a stable specialist role and sends the matching clue reply', async (t) => {
   FakeSocket.instances = [];
   const outgoing = [];
-  const { call, roomId, hostToken } = await start(t, { twitchOptions: {
+  const { call, roomId, hostToken } = await start(t, { mode: 'live', twitchOptions: {
     clientId: 'client', accessToken: 'server-secret', WebSocketImpl: FakeSocket,
     fetchImpl: async (url, options) => {
       if (url.endsWith('/validate')) return Response.json({ client_id: 'client', user_id: '123', login: 'broadcaster', scopes: ['user:read:chat', 'user:write:chat'] });

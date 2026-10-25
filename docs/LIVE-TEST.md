@@ -1,6 +1,6 @@
 # HEIST: real Twitch and OBS verification
 
-Status on 2026-10-25: local game and browser checks passed. No real Twitch account, real viewer command, OBS application capture, public viewer deployment, or live broadcast has been verified. The steps below are a runbook, not completed live-test evidence.
+Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pairing/solo browser checks passed locally. No real Twitch account, real viewer command, OBS application capture, public viewer deployment, or live broadcast has been verified. The steps below are a runbook, not completed live-test evidence.
 
 ## What the evidence actually proves
 
@@ -8,9 +8,12 @@ Status on 2026-10-25: local game and browser checks passed. No real Twitch accou
 | --- | --- | --- |
 | Game and HTTP server | Automated engine/API tests, including complete solutions across 100 seeds, role projections, clock, auth, and SSE updates | Behavior under a real stream's audience size and network conditions |
 | Browser UI | Recorded browser report: 26 checks, three independent crew sessions, complete escape, pause/resume, fail/reset, voting, mobile layouts, escaping | Human audience comprehension and effects of Twitch video latency |
+| Identity linking | Local API tests for both join orders, shared roles/votes, account overwrite protection, code expiry/replay/mission binding, guessing limits, and disconnected states | Real viewers sending pairing commands through Twitch and confirming in their own browsers |
 | Twitch bridge | Mocked token validation, subscription request, incoming event processing, identity/role assignment, duplicate suppression, reconnect migration, and outgoing reply request | Twitch accepting our real credentials/subscription, delivering real events, and publishing replies |
 | OBS overlay | `/overlay/ROOM` rendered in Chrome at 1920 × 1080, followed the mission outcome, and had no operator buttons | Rendering/transparency/live updates in OBS's embedded browser and visibility in an actual recording or stream |
 | Remote companion | Local browser joins and private dossiers | A viewer outside this computer opening a public HTTPS crew link |
+
+The identity implementation is covered by `test/pairing.test.mjs`. `test/pairing-browser.mjs` also passed 14 checks with zero browser runtime errors, including the complete anonymous solo demo. The optional `test/pairing-browser.mjs` starts a local application with test-only mocked Twitch transport; its report goes to `artifacts/pairing-browser/report.json`. Neither the fixture nor its credential substitutes are available through production routes.
 
 Reproduce source checks with `npm run check` and `npm test`. The prior browser report is `artifacts/browser/report.json` (intentionally ignored by Git); `test/browser-smoke.mjs` reproduces the browser checks when Playwright and Chromium are available. Mocked Twitch tests do not contact Twitch.
 
@@ -30,7 +33,7 @@ This implementation uses the installed-chatbot model: the token owner is both th
 
 6. Authorize while logged into the **broadcaster account whose channel will host HEIST**. Use the returned user access token, not the refresh token or client secret, in HEIST.
 7. In the Twitch folder, copy `.env.example` to `.env` only if you have not already configured it. Set `TWITCH_CLIENT_ID` and `TWITCH_ACCESS_TOKEN` locally. `.env` is ignored by Git. HEIST itself does not use the client secret or refresh token.
-8. Run `npm start`, open `http://127.0.0.1:3000`, and create a mission using **Assemble your crew**. Keep this operator tab open.
+8. Run `npm start`, open `http://127.0.0.1:3000`, and choose **Create live mission**. Rehearsal remains anonymous and cannot connect Twitch or be switched to live. Keep this operator tab open.
 9. Open **Broadcast setup → Connect Twitch**. Wait for **Connected to YOUR_CHANNEL**. The UI checks the status every five seconds.
 
 `user:read:chat` is required; `user:write:chat` enables replies. This follows [Twitch's installed-chatbot scopes](https://dev.twitch.tv/docs/chat/authenticating/), [CLI configuration](https://dev.twitch.tv/docs/cli/configure-command/), and [user-token instructions](https://dev.twitch.tv/docs/cli/token-command/).
@@ -39,7 +42,19 @@ This implementation uses the installed-chatbot model: the token owner is both th
 
 ## 2. Receive a real viewer command
 
-Use a second Twitch account as the viewer so this tests a real viewer identity. Keep demo crew controls unused during this test.
+Use a second Twitch account as the viewer so this tests a real viewer identity. Demo controls are unavailable in a live mission.
+
+Before requesting a code, open the crew page while the bridge is disconnected: it should show **Twitch pairing unavailable**, with no dossier or voting controls. Connect the bridge and verify that **Get pairing code** becomes available. Then:
+
+1. Request a code in the companion and send its exact `!link ROOM-CODE` command in Twitch chat.
+2. Return to the companion. It should identify the responding Twitch account and ask for **Confirm account**. Before confirming, verify no private clue or companion vote is available.
+3. Check the account name, confirm, and verify the assigned dossier opens. The code must not appear in host mission comms; the command itself is visible in Twitch chat.
+4. Open an independent browser, repeat pairing with the same Twitch account, and verify both dossiers have the same role and the crew count has not increased.
+5. Vote in chat, change the vote from one browser, then from the other browser. Confirm the total remains one vote for that account and both companions show the latest accepted vote.
+6. Retry a consumed code from another account. Verify the linked browser retains its original account. A linked browser must not offer a replacement code.
+7. Test a fresh code after two minutes, and test a code from a different mission. Neither should link a browser. Disconnect/reconnect to verify unavailable/recovery states.
+
+Repeat with `!heist` sent before opening the first companion. The role must match in both join orders. These pairing checks have passed against mocked Twitch locally, not a real channel.
 
 | Viewer action | Expected HEIST evidence | Additional Twitch evidence |
 | --- | --- | --- |
@@ -60,8 +75,8 @@ Viewer Twitch chat → Twitch EventSub → HEIST server → mission state → op
 ### Current limitations that affect this test
 
 - `!clue` deliberately shares the clue into public mission communications and optionally public Twitch chat. It is not a whisper. The companion dossier is the private view until the viewer shares it.
-- Chat and companion identities are independent. Typing the same name does not link them. Select your chat-assigned role on the companion page if you want matching clues; the two identities can both count toward the crew total.
-- Any incoming nonempty Twitch chat message currently enrolls its sender. The displayed crew count means enrolled identities, not currently connected viewers.
+- Live chat and confirmed companion sessions share the canonical Twitch user ID. Linking is verified from the chat event sender, not a typed callsign. One account has one role and one latest vote; anonymous identities are allowed only in rehearsal.
+- Any incoming nonempty Twitch chat message other than a linking attempt currently enrolls its sender. The displayed crew count means enrolled identities, not currently connected viewers.
 - Optional replies are throttled globally: commands arriving less than 1.8 seconds after the previous reply may receive no reply, although incoming commands can still be processed. Allow at least two seconds between verification commands.
 - The bridge sends a reply request but does not currently inspect Twitch's `is_sent`/`drop_reason` result or display every non-401 send failure. An incoming clue in HEIST is not proof the outgoing reply was published. Check Twitch chat itself; [Twitch documents these delivery fields](https://dev.twitch.tv/docs/api/reference/#send-chat-message).
 - There is no automatic access-token refresh. An expired/revoked token must be replaced and the server restarted. Restarting clears rooms; reconnect the channel and replace the OBS room URL afterward.
@@ -75,7 +90,7 @@ Incoming Twitch commands and local OBS can work with the server on this computer
 2. Set `PUBLIC_ORIGIN` to that exact HTTPS origin if the proxy requires it, then restart before creating the test room. A tunnel sharing the local server need not expose the server on every local interface.
 3. Open the operator UI through the public origin and create the mission there, so **Invite your crew** produces a public `/crew/ROOM` URL. A room already created locally uses the same room ID on a tunnel to that same process; its crew URL can also be rewritten to the public origin manually.
 4. Share only the crew URL. Keep the operator credential private.
-5. On a phone using mobile data, open the link, join a role, and confirm its dossier appears. Relay a clue and verify it reaches the host. A same-computer test does not prove this path.
+5. On a phone using mobile data, open the link, get a pairing code, send it in Twitch chat, and confirm the displayed account before the dossier appears. Relay a clue and verify it reaches the host. A same-computer test does not prove this path.
 
 A separate deployed server has separate room memory. Do not create the room locally and expect an unrelated deployment to know it.
 
@@ -108,6 +123,9 @@ Fill these only after performing the checks, without recording access tokens or 
 - Broadcaster channel:
 - Viewer account(s):
 - Connected status observed:
+- Real `!link` received and account confirmed in the companion:
+- Same role and single vote across two real browsers:
+- Expired/reused/wrong-mission pairing commands rejected live:
 - Real `!heist` / `!clue` received in HEIST:
 - Actual outgoing `[HEIST]` reply visible in Twitch:
 - Real wire/exit vote changed host UI:

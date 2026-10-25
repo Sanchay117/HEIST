@@ -4,8 +4,8 @@ Target duration: **2 minutes 45 seconds**, leaving room below the three-minute l
 
 ## Prepare
 
-- Start the server and create a fresh mission.
-- Open the host view, one browser crew view for each role, and the OBS overlay.
+- Start the server and create a fresh rehearsal for a solo demo, or choose **Create live mission** for a real Twitch recording. Modes cannot be switched.
+- Open the host view, one browser crew view for each role, and the OBS overlay. Live companions must send their own one-time `!link` command and confirm the Twitch account before their dossier opens. Use three Twitch accounts to cover all live roles; multiple browsers of one account keep one role and one vote.
 - Use three independent profiles or private browser contexts so each crew member has a distinct session.
 - If recording the Twitch integration, configure the broadcaster's token, connect the bridge, and verify a real channel chat message appears in the room before recording.
 - Keep tokens, environment files, private account details, and crew dossiers out of the main stream capture.

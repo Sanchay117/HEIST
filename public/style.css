@@ -81,3 +81,5 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .mobile-tabs{display:none}@media(max-width:540px){.mobile-tabs{display:flex;border-bottom:1px solid var(--border);padding:4px 12px;gap:5px}.mobile-tabs button{border:0;background:transparent;color:var(--muted);padding:9px 8px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:9px;flex:1}.mobile-tabs button svg{width:13px;height:13px}.mobile-tabs button:hover{color:var(--accent)}}
+
+.pairing-card{max-width:580px}.pairing-card h2{font:600 29px var(--display);margin:10px 0 15px}.pairing-card p{font-size:12px;line-height:1.8;color:var(--muted)}.pair-command{font:12px var(--mono);letter-spacing:.2px}.identity-banner{margin-top:22px}.pairing-card .notice strong{color:var(--text)}

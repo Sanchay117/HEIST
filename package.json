@@ -9,7 +9,7 @@
     "start": "node --env-file-if-exists=.env server.mjs",
     "dev": "node --env-file-if-exists=.env --watch server.mjs",
     "test": "node --test test/*.test.mjs",
-    "check": "node --check server.mjs && node --check lib/engine.mjs && node --check lib/twitch.mjs && node --check public/app.js"
+    "check": "node --check server.mjs && node --check lib/engine.mjs && node --check lib/twitch.mjs && node --check lib/pairing.mjs && node --check public/app.js"
   },
   "license": "MIT"
 }

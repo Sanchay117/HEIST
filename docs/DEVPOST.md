@@ -20,7 +20,7 @@ The experience includes a shared countdown, a three-strike alarm, audience commu
 
 The implementation uses Node.js 24, browser JavaScript, CSS, and Canvas. A server-authoritative engine owns the puzzle answers, timer, and mission transitions. Server-sent events keep host, crew, and overlay views synchronized. Each crew session receives only its assigned role's current dossier; host and public state omit private clue data.
 
-The Twitch bridge uses a broadcaster user access token and EventSub WebSockets to receive channel chat. Credentials remain server-side. Chat commands introduce the mission, share a participant's role clue, and register votes, while the host retains control over actions.
+Live missions link companions to a verified Twitch account using a short-lived, single-use chat code and explicit browser confirmation. Chat and all linked browsers reuse one participant, role, and latest vote. Anonymous role selection and the solo demo remain available in rehearsal. The Twitch bridge uses a broadcaster user access token and EventSub WebSockets to receive channel chat. Credentials remain server-side. Chat commands introduce the mission, share a participant's role clue, and register votes, while the host retains control over actions.
 
 Codex helped implement the project across the game engine, interface, server, tests, and documentation. Before submission, replace this sentence with two concrete examples visible in the build chat and recording, and include the actual session ID obtained from `/status`.
 
