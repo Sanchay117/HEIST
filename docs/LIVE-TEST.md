@@ -1,6 +1,6 @@
 # HEIST: real Twitch and OBS verification
 
-Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pairing/solo browser checks passed locally. No real Twitch account, real viewer command, OBS application capture, public viewer deployment, or live broadcast has been verified. The steps below are a runbook, not completed live-test evidence.
+Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pairing/solo browser checks passed locally. Real broadcaster authorization, a connected Twitch subscription, an incoming `!heist` command, Cipher assignment, and the outgoing role reply visible in Twitch chat are now verified. The command was sent from the broadcaster account, not a separate viewer. Real pairing, votes, an independent viewer, OBS capture, public viewer deployment, and live broadcast remain unverified. See [the live evidence record](LIVE-EVIDENCE-2026-10-26.md); the remaining steps below are a runbook.
 
 ## What the evidence actually proves
 
@@ -9,7 +9,7 @@ Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pa
 | Game and HTTP server | Automated engine/API tests, including complete solutions across 100 seeds, role projections, clock, auth, and SSE updates | Behavior under a real stream's audience size and network conditions |
 | Browser UI | Recorded browser report: 26 checks, three independent crew sessions, complete escape, pause/resume, fail/reset, voting, mobile layouts, escaping | Human audience comprehension and effects of Twitch video latency |
 | Identity linking | Local API tests for both join orders, shared roles/votes, account overwrite protection, code expiry/replay/mission binding, guessing limits, and disconnected states | Real viewers sending pairing commands through Twitch and confirming in their own browsers |
-| Twitch bridge | Mocked token validation, subscription request, incoming event processing, identity/role assignment, duplicate suppression, reconnect migration, and outgoing reply request | Twitch accepting our real credentials/subscription, delivering real events, and publishing replies |
+| Twitch bridge | Mocked lifecycle checks; real broadcaster token validation and connection; real incoming `!heist`, Cipher assignment, and a role reply visibly published in Twitch chat | A separate viewer, pairing and votes through Twitch, recovery and long-session behavior, audience bursts, and delivery of every optional reply |
 | OBS overlay | `/overlay/ROOM` rendered in Chrome at 1920 × 1080, followed the mission outcome, and had no operator buttons | Rendering/transparency/live updates in OBS's embedded browser and visibility in an actual recording or stream |
 | Remote companion | Local browser joins and private dossiers | A viewer outside this computer opening a public HTTPS crew link |
 
@@ -21,7 +21,7 @@ Reproduce source checks with `npm run check` and `npm test`. The prior browser r
 
 This implementation uses the installed-chatbot model: the token owner is both the broadcaster and the chat-reading user. Optional replies are sent as that broadcaster. There is no separate bot-account setup or channel-name selector.
 
-1. Follow [Twitch's app registration instructions](https://dev.twitch.tv/docs/authentication/register-app/). The account must have verified email and 2FA. For the CLI route below, use an app that supplies a client secret and register the exact OAuth redirect `http://localhost:3000`.
+1. Follow [Twitch's app registration instructions](https://dev.twitch.tv/docs/authentication/register-app/). The account must have verified email and 2FA. For the CLI route below, use an app that supplies a client secret and register the exact OAuth redirect `http://localhost:3000`. If only one redirect is needed, remove any extra blank redirect field; do not leave an empty second entry after clicking Add.
 2. Install the [official Twitch CLI](https://dev.twitch.tv/docs/cli/) if it is missing. On macOS its documented command is `brew install twitchdev/twitch/twitch-cli`.
 3. Stop HEIST before requesting the user token. The CLI's OAuth callback also uses port 3000; leave that port free until token creation finishes.
 4. Run `twitch configure`. Enter this application's client ID and client secret at its local prompts.

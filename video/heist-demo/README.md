@@ -52,9 +52,11 @@ The build chapter shows actual Codex-built source plus freshly executed checks. 
 
 ## What still needs the user and real Twitch
 
-No Twitch credentials were configured during production. No real channel interaction, real viewer chat vote, OBS recording, public viewer deployment or live broadcast is claimed.
+No Twitch credentials were configured during the original rehearsal production. After export, real broadcaster authorization, an incoming `!heist`, and a visibly published role reply were verified; see [the live evidence record](../../docs/LIVE-EVIDENCE-2026-10-26.md). The command came from the broadcaster account. No independent viewer vote, real pairing, OBS recording, public viewer deployment or live broadcast is claimed, and the exported cut has not yet been replaced with live footage.
 
-**Exact next step:** create/authorize the broadcaster application and put `TWITCH_CLIENT_ID` and its broadcaster `TWITCH_ACCESS_TOKEN` into the local HEIST `.env`. Follow `docs/LIVE-TEST.md`; generate the token before starting HEIST because the CLI callback also uses port 3000. Start HEIST, choose **Create live mission**, and connect the broadcaster's channel.
+**Current next step:** pair the broadcaster's companion through the normal chat-code flow, then check vote replacement across interfaces. For a fresh setup, follow `docs/LIVE-TEST.md` to authorize the broadcaster, start HEIST, choose **Create live mission**, and connect the channel. Generate the token before starting HEIST because the CLI callback also uses port 3000.
+
+While the real mission is running, `node video/heist-demo/watch-live.mjs ROOM` archives changes from its public SSE projection under `artifacts/live-verification/ROOM/`. This is supplementary event evidence, not video footage; it contains no private dossiers or control credentials.
 
 For a fully live three-role story, have the broadcaster plus two viewer accounts available (three Twitch identities total). Each account gets one role. Each companion must request its own `!link` code, send it from that account in channel chat, and confirm the account name. A real viewer then votes; record both the chat command and corresponding host vote count, followed by the successful escape in that same mission. Keep all credentials and private account settings outside the recording.
 
