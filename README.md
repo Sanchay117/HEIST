@@ -116,4 +116,8 @@ Twitch/
 
 This is source code and local demo tooling. A Twitch broadcast, public repository, hosted URL, recorded demo, and Devpost submission must each be verified separately. See [the demo plan](docs/DEMO.md) and [submission draft](docs/DEVPOST.md). Record the actual Codex session ID from the build chat's `/status` output before submitting.
 
+## Cinematic demo production
+
+A 2:49 cinematic rehearsal cut is available locally at `artifacts/heist-demo/exports/HEIST-Rehearsal-Demo.mp4`, with a thumbnail, captions, transcript, original sound stems, raw browser recordings and an editable production ZIP. [Production instructions and storyboard](video/heist-demo/README.md) document how to rebuild it. The cut includes an actual successful browser rehearsal and companion vote; its Twitch identity insert is explicitly simulated. Verified real Twitch and OBS footage must still be captured before treating it as a submission-ready integration demo.
+
 MIT licensed. HEIST is an independent project; Twitch and OpenAI are referenced as integration and development platforms.

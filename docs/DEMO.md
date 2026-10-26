@@ -1,5 +1,7 @@
 # HEIST demo recording plan
 
+The new cinematic production is documented in [the production folder](../video/heist-demo/README.md) and [its storyboard](../video/heist-demo/STORYBOARD.md). Its delivered local rehearsal cut is 2:49, with Deepgram narration, original score/foley, burned captions and editable sources. It is clearly labeled rehearsal; real Twitch pairing/vote footage and OBS capture remain pending. The sequence below remains the live-verification recording plan.
+
 Target duration: **2 minutes 45 seconds**, leaving room below the three-minute limit. Record a real run with the final code. Do not present demo crew messages as live audience participation.
 
 ## Prepare

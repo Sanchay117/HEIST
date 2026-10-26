@@ -8,3 +8,5 @@ test-results/
 artifacts/
 *.log
 playwright-report/
+__pycache__/
+*.py[cod]

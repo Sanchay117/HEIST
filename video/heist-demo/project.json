@@ -1,0 +1,168 @@
+{
+  "title": "HEIST \u2014 The Meridian Job",
+  "version": "rehearsal-cut",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 169,
+  "voice": "aura-2-draco-en",
+  "disclosure": "LOCAL REHEARSAL \u00b7 AUTOMATED BROWSER CREW",
+  "scenes": [
+    {
+      "id": "01",
+      "start": 0,
+      "duration": 10,
+      "style": "opening",
+      "title": "HEIST",
+      "subtitle": "THE MERIDIAN JOB",
+      "sentences": [
+        "The streamer has the controls.",
+        "Chat has the blueprints."
+      ]
+    },
+    {
+      "id": "02",
+      "start": 10,
+      "duration": 14,
+      "style": "briefing",
+      "title": "ONE VAULT. ONE CREW.",
+      "subtitle": "OPERATION 001 / MERIDIAN RESERVE",
+      "sentences": [
+        "Welcome to the Meridian job.",
+        "Three locks. One countdown.",
+        "The operator can touch the vault, but the crew holds the intelligence."
+      ]
+    },
+    {
+      "id": "03",
+      "start": 24,
+      "duration": 18,
+      "style": "roles",
+      "title": "MEET YOUR SPECIALISTS",
+      "subtitle": "DIFFERENT INTELLIGENCE / SHARED OBJECTIVE",
+      "sentences": [
+        "Cipher intercepts the numbers.",
+        "Architect knows the order.",
+        "Lookout sees what everyone else misses.",
+        "Each dossier holds a different piece."
+      ]
+    },
+    {
+      "id": "04",
+      "start": 42,
+      "duration": 18,
+      "style": "split",
+      "title": "YOU SEE WHAT I CAN\u2019T.",
+      "subtitle": "PRIVATE DOSSIERS / REAL APP VIEWS",
+      "sentences": [
+        "In this local rehearsal, three browser crew members receive separate clues.",
+        "No one has the whole answer.",
+        "The crew has to talk."
+      ]
+    },
+    {
+      "id": "05",
+      "start": 60,
+      "duration": 16,
+      "style": "combine",
+      "title": "MAKE THE CONNECTION.",
+      "subtitle": "01 / BREACH THE VAULT",
+      "sentences": [
+        "Now combine the symbols with the intercepted digits.",
+        "One code, assembled by the crew.",
+        "The operator commits. The vault opens."
+      ]
+    },
+    {
+      "id": "06",
+      "start": 76,
+      "duration": 18,
+      "style": "vote",
+      "title": "THE CREW RECOMMENDS.",
+      "subtitle": "02 / SILENCE THE ALARM",
+      "sentences": [
+        "Five wires. One safe bypass.",
+        "Match terminal, pulse, and seal.",
+        "A companion vote reaches the running game.",
+        "The recommendation updates. The final call stays with the operator."
+      ]
+    },
+    {
+      "id": "07",
+      "start": 94,
+      "duration": 14,
+      "style": "pairing",
+      "title": "ONE ACCOUNT. ONE VOTE.",
+      "subtitle": "PAIRING CHECK / SIMULATED TWITCH TRANSPORT",
+      "sentences": [
+        "Live missions add chat-code pairing.",
+        "One Twitch account keeps one role and one vote across browsers.",
+        "This check is simulated. Real-channel footage is still pending."
+      ]
+    },
+    {
+      "id": "08",
+      "start": 108,
+      "duration": 18,
+      "style": "escape",
+      "title": "READ THE ROOM. FIND THE ROUTE.",
+      "subtitle": "03 / MAKE YOUR ESCAPE",
+      "sentences": [
+        "The last puzzle changes the route.",
+        "Architect has the ring. Cipher has the clearance.",
+        "Lookout has the lockdown shift.",
+        "Three perspectives become one escape plan."
+      ]
+    },
+    {
+      "id": "09",
+      "start": 126,
+      "duration": 13,
+      "style": "climax",
+      "title": "TRUST YOUR CREW.",
+      "subtitle": "FINAL APPROACH / ELAPSED TIME CONDENSED",
+      "sentences": [
+        "Time is almost gone.",
+        "Check the ring. Apply the shift.",
+        "Trust your crew. Take the exit."
+      ]
+    },
+    {
+      "id": "10",
+      "start": 139,
+      "duration": 9,
+      "style": "success",
+      "title": "THE PERFECT GETAWAY.",
+      "subtitle": "ARTIFACT SECURED / CREW EXTRACTED",
+      "sentences": [
+        "Artifact secured. Crew extracted.",
+        "Every clue mattered. Every decision belonged to the streamer."
+      ]
+    },
+    {
+      "id": "11",
+      "start": 148,
+      "duration": 13,
+      "style": "codex",
+      "title": "BUILT WITH CODEX.",
+      "subtitle": "ACTUAL SOURCE / EXECUTED LOCAL CHECKS",
+      "sentences": [
+        "Codex helped build shared identity linking, then tested both join orders and vote replacement.",
+        "All local checks passed. Twenty-nine automated tests. Forty browser checks."
+      ],
+      "voice_tempo": 1.18
+    },
+    {
+      "id": "12",
+      "start": 161,
+      "duration": 8,
+      "style": "outro",
+      "title": "HEIST",
+      "subtitle": "TRUST YOUR CREW.",
+      "sentences": [
+        "Heist. A stream becomes a crew.",
+        "The next move is yours."
+      ]
+    }
+  ]
+}
