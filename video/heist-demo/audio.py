@@ -3,10 +3,8 @@ from pathlib import Path
 import json, math, subprocess, textwrap
 import numpy as np
 import soundfile as sf
+from production import ROOT, OUT, PROJECT as P
 
-ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'artifacts/heist-demo'
-P=json.loads((Path(__file__).parent/'project.json').read_text())
 SR=48000
 N=int(P['duration']*SR)
 

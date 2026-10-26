@@ -4,10 +4,10 @@ import concurrent.futures,json,math,re,subprocess,struct
 import cv2
 from PIL import Image,ImageDraw
 from narrate import load_key
+from production import ROOT, OUT, PROJECT as P, EXPORT_NAME
 
-ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'artifacts/heist-demo';QA=OUT/'qa';VIDEO=OUT/'exports/HEIST-Rehearsal-Demo.mp4'
-P=json.loads((Path(__file__).parent/'project.json').read_text())
-report={'version':'rehearsal cut','real_twitch_verified':False,'obs_broadcast_verified':False,'checks':{},'limits':['No subjective audio listening was available; speech content and mix were checked with transcription and loudness analysis.','Real Twitch and OBS capture require user credentials/interaction.']}
+QA=OUT/'qa';VIDEO=OUT/'exports'/EXPORT_NAME
+report={'version':P['version'],'real_twitch_transport_verified':P.get('real_twitch_transport_verified',False),'full_live_mission_verified':False,'obs_broadcast_verified':False,'checks':{},'limits':['No subjective audio listening was available; speech content and mix were checked with transcription and loudness analysis.',P.get('verification_limit','Real Twitch and OBS capture require user credentials/interaction.')]}
 
 def run(args):return subprocess.run(args,check=True,capture_output=True,text=True)
 probe=json.loads(run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(VIDEO)]).stdout)
@@ -65,7 +65,12 @@ for page in range(math.ceil(len(images)/36)):
 report['checks']['frame_review']={'decoded_frames':count,'one_second_review_images':len(images),'contact_sheets':math.ceil(len(images)/36)}
 
 # The key is compared in memory. Never print it, include it in reports, or copy its source file.
-key=load_key();needle=key.encode();matches=[]
+keys=[load_key()]
+for line in (ROOT/'.env').read_text().splitlines() if (ROOT/'.env').exists() else []:
+    if '=' not in line or line.lstrip().startswith('#'):continue
+    name,value=line.split('=',1)
+    if name.strip() in ('TWITCH_ACCESS_TOKEN','TWITCH_CLIENT_SECRET') and value.strip():keys.append(value.strip().strip('\"\''))
+needles=[key.encode() for key in keys];matches=[]
 for folder in [OUT,ROOT/'video/heist-demo']:
     for path in folder.rglob('*'):
         if not path.is_file() or 'python-deps' in path.parts or path.suffix=='.zip':continue
@@ -73,19 +78,25 @@ for folder in [OUT,ROOT/'video/heist-demo']:
             tail=b''
             while chunk:=stream.read(1024*1024):
                 data=tail+chunk
-                if needle in data:matches.append(str(path.relative_to(ROOT)));break
-                tail=data[-len(needle):]
+                if any(needle in data for needle in needles):matches.append(str(path.relative_to(ROOT)));break
+                tail=data[-max(map(len,needles)):]
 def ocr(path):
     result=subprocess.run(['tesseract',str(path),'stdout','--psm','11'],capture_output=True,text=True)
     return result.stdout
 sample=[path for i,path in enumerate(images) if i%3==1]
 with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
     for path,text in zip(sample,pool.map(ocr,sample)):
-        if key in text or re.sub(r'\W','',key) in re.sub(r'\W','',text):matches.append(str(path.relative_to(ROOT)))
-del key,needle
+        if any(key in text or re.sub(r'\W','',key) in re.sub(r'\W','',text) for key in keys):matches.append(str(path.relative_to(ROOT)))
+del keys,needles
 assert not matches,'Credential match found. Export must not be delivered.'
 report['checks']['credential_scan']={'production_files_checked':True,'ocr_frames_checked':len(sample),'matches':0,'environment_files_recorded_or_bundled':False}
 capture=json.loads((OUT/'capture.json').read_text());assert capture['result']['phase']=='escaped' and not capture['runtimeErrors']
 report['checks']['app_capture']={'outcome':capture['result'],'runtime_errors':capture['runtimeErrors'],'vote_source':'automated local browser, real HTTP request; not a Twitch viewer'}
+if P.get('real_twitch_transport_verified'):
+    live=json.loads((OUT/'live-evidence/vote-result.json').read_text())
+    votes=[m for m in live['comms'] if m['text'].startswith('!vote ')]
+    assert [(m['source'],m['text']) for m in votes]==[('crew','!vote 1234'),('twitch','!vote 5678')]
+    assert live['votes']==[{'optionId':'5678','count':1}] and len(live['members'])==1 and live['members'][0]['role']=='cipher'
+    report['checks']['real_twitch_account_check']={'source':'Human broadcaster account through actual Twitch and companion','role':'cipher','member_count':1,'accepted_votes':votes,'final_votes':live['votes'],'full_live_escape':False,'note':'The test mission later timed out. The successful escape elsewhere is labeled rehearsal.'}
 report['passed']=True
 (QA/'verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

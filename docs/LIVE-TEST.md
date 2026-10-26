@@ -1,6 +1,6 @@
 # HEIST: real Twitch and OBS verification
 
-Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pairing/solo browser checks passed locally. Real broadcaster authorization, a connected Twitch subscription, an incoming `!heist` command, Cipher assignment, and the outgoing role reply visible in Twitch chat are now verified. The command was sent from the broadcaster account, not a separate viewer. Real pairing, votes, an independent viewer, OBS capture, public viewer deployment, and live broadcast remain unverified. See [the live evidence record](LIVE-EVIDENCE-2026-10-26.md); the remaining steps below are a runbook.
+Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pairing/solo browser checks passed again locally. The real broadcaster completed authorization, joined through Twitch, paired a companion, and sent votes through both interfaces. The game retained one Cipher member and one final vote; real role/pairing/vote replies were visible in Twitch chat. These checks used the broadcaster account. A separate viewer, multiple real linked browsers, a three-role live escape, OBS capture, public viewer deployment, and live broadcast remain unverified. See [the live evidence record](LIVE-EVIDENCE-2026-10-26.md); the remaining steps below are a runbook.
 
 ## What the evidence actually proves
 
@@ -8,8 +8,8 @@ Status on 2026-10-26: 29 automated tests, 26 rehearsal browser checks, and 14 pa
 | --- | --- | --- |
 | Game and HTTP server | Automated engine/API tests, including complete solutions across 100 seeds, role projections, clock, auth, and SSE updates | Behavior under a real stream's audience size and network conditions |
 | Browser UI | Recorded browser report: 26 checks, three independent crew sessions, complete escape, pause/resume, fail/reset, voting, mobile layouts, escaping | Human audience comprehension and effects of Twitch video latency |
-| Identity linking | Local API tests for both join orders, shared roles/votes, account overwrite protection, code expiry/replay/mission binding, guessing limits, and disconnected states | Real viewers sending pairing commands through Twitch and confirming in their own browsers |
-| Twitch bridge | Mocked lifecycle checks; real broadcaster token validation and connection; real incoming `!heist`, Cipher assignment, and a role reply visibly published in Twitch chat | A separate viewer, pairing and votes through Twitch, recovery and long-session behavior, audience bursts, and delivery of every optional reply |
+| Identity linking | Local API tests for both join orders, shared roles/votes, overwrite protection, code expiry/replay/mission binding, guessing limits and disconnected states; a real chat-first broadcaster companion, retained Cipher role, and companion-to-chat vote replacement | A separate viewer, multiple independently linked browsers on the real channel, companion-first joining and remaining edge cases through real Twitch |
+| Twitch bridge | Mocked lifecycle checks; real broadcaster token validation and connection; real `!heist`, `!link`, and `!vote` delivery; role, pairing and vote replies visibly published in Twitch chat | A separate viewer, recovery and long-session behavior, audience bursts, and delivery of every optional reply |
 | OBS overlay | `/overlay/ROOM` rendered in Chrome at 1920 × 1080, followed the mission outcome, and had no operator buttons | Rendering/transparency/live updates in OBS's embedded browser and visibility in an actual recording or stream |
 | Remote companion | Local browser joins and private dossiers | A viewer outside this computer opening a public HTTPS crew link |
 

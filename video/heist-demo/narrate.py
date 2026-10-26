@@ -9,10 +9,9 @@ import subprocess
 import time
 import wave
 import requests
+from production import ROOT, PROJECT, OUT as PRODUCTION_OUT
 
-ROOT = Path(__file__).resolve().parents[2]
-PROJECT = json.loads((Path(__file__).parent / 'project.json').read_text())
-OUT = ROOT / 'artifacts/heist-demo/audio'
+OUT = PRODUCTION_OUT / 'audio'
 ALIASES = ('DEEPGRAM_API_KEY', 'DEEPGRAM_TTS_KEY', 'DEEPGRAM_KEY', 'DEEPGRAM_API', 'TTS')
 
 def load_key():

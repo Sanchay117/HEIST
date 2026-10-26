@@ -30,3 +30,10 @@ This production is a clearly disclosed rehearsal. Browser participants are autom
 ## Editable sources
 
 `project.json` controls script, scene order, lengths and titles. Scripts create raw recordings, per-sentence Deepgram narration, music/effects stems, captions, scene renders, a final MP4 and an EDL. No API key is saved in this directory or the media bundle.
+# Revised real Twitch insert
+
+`project-live-check.json` preserves the 2:49 story and replaces scene07 (01:34–01:48) with actual captured Twitch chat and in-app communications from the broadcaster's human test. Persistent disclosure: **REAL TWITCH / BROADCASTER ACCOUNT TEST**. The other gameplay scenes keep **LOCAL REHEARSAL / AUTOMATED CREW**.
+
+Narration: “Now, a real Twitch check. The companion and chat share one verified identity. Two recommendations become one final vote.”
+
+Visuals: show the actual accepted `!link` and reply, then the actual `!vote 5678` and reply. Pair the real game communications (`1234` from companion, `5678` from Twitch) with a distinct **VERIFIED SERVER STATE** annotation: `1234 → 5678`, **01 FINAL VOTE**. The count comes from the archived public projection; it is not presented as a native keypad UI element. Scene11's footer now reads **REAL TWITCH VOTE VERIFIED**. The successful escape remains the separate rehearsal run; the one-account transport test timed out after the votes.

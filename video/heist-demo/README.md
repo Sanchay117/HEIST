@@ -1,6 +1,8 @@
 # HEIST — editable cinematic demo production
 
-The independent production is a **2:49 rehearsal cut**, not verified live Twitch footage. It uses a fresh successful run of the actual app, three automated browser participants, a real companion HTTP vote and the real eight-minute countdown, condensed in the edit. The pairing insert is explicitly labeled **SIMULATED TWITCH**. Its source is the existing test-only transport, never a production authentication bypass.
+The original independent production is a **2:49 rehearsal cut**. It uses a successful run of the actual app, three automated browser participants, a real companion HTTP vote and the real eight-minute countdown, condensed in the edit. Its pairing insert is explicitly labeled **SIMULATED TWITCH**. Its source is the existing test-only transport, never a production authentication bypass.
+
+The revised **2:49 rehearsal + real Twitch check** uses `project-live-check.json` and writes to `artifacts/heist-final-demo/`. Its scene07 replaces the simulation with actual broadcaster Twitch pairing/vote footage and actual game communications, showing one Cipher account and one final vote. The escape remains labeled rehearsal. This is a one-account integration check; no independent viewer, three-account live escape or OBS recording is claimed.
 
 ## Deliverables
 
@@ -40,6 +42,15 @@ python3 video/heist-demo/package.py
 
 `render.py --scene 06` rerenders only that scene. Run `python3 video/heist-demo/render.py --assemble` to assemble the updated scene sequence without rerendering the other scenes. An existing complete source bundle can be edited and rendered using the cached narration without any API access.
 
+To rebuild the revised cut, select its project and output directory before running the same narration/audio/render/verify/package commands:
+
+```sh
+export HEIST_DEMO_PROJECT=video/heist-demo/project-live-check.json
+export HEIST_DEMO_OUTPUT=artifacts/heist-final-demo
+```
+
+Its MP4 is `exports/HEIST-Demo.mp4`. The original export is preserved in its original directory. The revised bundle includes the actual footage and `live-evidence/vote-result.json`. The server state graphic is an explicitly labeled check derived from that recorded projection, separate from the actual Twitch and game UI crops. The broadcaster test timed out after the accepted votes; the successful escape shown elsewhere is the rehearsal run.
+
 ## Narration and sound
 
 Deepgram's official current REST API is `POST /v1/speak`, authenticated with an in-memory `Authorization: Token` header. Voice: `aura-2-draco-en`, a British baritone offered for storytelling. Source audio is linear16 WAV at 48 kHz. The Codex evidence chapter is edited at 1.18× tempo to fit its 13-second window without changing pitch.
@@ -50,11 +61,13 @@ Music and effects are original deterministic synthesis in `audio.py`: a restrain
 
 The build chapter shows actual Codex-built source plus freshly executed checks. It does not imitate the Codex interface. Native Codex screen capture was unavailable, so it uses a designed source/evidence presentation.
 
+`capture-live-cua.mjs` contains the exact browser-screenshot capture workflow for real HEIST/Twitch pages. Use it through the CUA REPL with an explicitly selected clean app/chat tab; it rejects authorization URLs. `assemble-live-capture.py ROOM` converts the resulting timestamped PNGs into real-time MP4s. These captures are browser footage, not OBS recordings. `transcribe.py --mix` checks the generated final mix, while its default checks the separate narration stem.
+
 ## What still needs the user and real Twitch
 
-No Twitch credentials were configured during the original rehearsal production. After export, real broadcaster authorization, an incoming `!heist`, and a visibly published role reply were verified; see [the live evidence record](../../docs/LIVE-EVIDENCE-2026-10-26.md). The command came from the broadcaster account. No independent viewer vote, real pairing, OBS recording, public viewer deployment or live broadcast is claimed, and the exported cut has not yet been replaced with live footage.
+No Twitch credentials were configured during the original rehearsal production. After export, real broadcaster authorization, `!heist`, `!link`, linked companion participation, replacement of a companion vote by a Twitch vote, and visible role/pairing/vote replies were verified; see [the live evidence record](../../docs/LIVE-EVIDENCE-2026-10-26.md). The human confirmed only one account is available. No independent viewer, three-account live escape, OBS recording, public viewer deployment or live broadcast is claimed.
 
-**Current next step:** pair the broadcaster's companion through the normal chat-code flow, then check vote replacement across interfaces. For a fresh setup, follow `docs/LIVE-TEST.md` to authorize the broadcaster, start HEIST, choose **Create live mission**, and connect the channel. Generate the token before starting HEIST because the CLI callback also uses port 3000.
+For a fresh setup, follow `docs/LIVE-TEST.md` to authorize the broadcaster, start HEIST, choose **Create live mission**, and connect the channel. Generate the token before starting HEIST because the CLI callback also uses port 3000.
 
 While the real mission is running, `node video/heist-demo/watch-live.mjs ROOM` archives changes from its public SSE projection under `artifacts/live-verification/ROOM/`. This is supplementary event evidence, not video footage; it contains no private dossiers or control credentials.
 
@@ -62,4 +75,4 @@ For a fully live three-role story, have the broadcaster plus two viewer accounts
 
 The editable timeline reserves scene06 (01:16–01:34) for the vote and scene07 (01:34–01:48) for identity linking. Replace those with verified real footage, update their narration/disclosures, and rerender. For a fully live mission recording, replace the other app scenes with the corresponding live mission sources too. Do not remove rehearsal labels from footage that remains rehearsal.
 
-Browser rendering of the HUD has passed. OBS itself and the outbound Twitch stream still need the separate checkpoints in `docs/LIVE-TEST.md`. The real-channel capture is required before calling the video submission-ready.
+Browser rendering of the HUD has passed. OBS itself and the outbound Twitch stream still need the separate checkpoints in `docs/LIVE-TEST.md`. Keep those claims separate from the real one-account Twitch evidence in the revised video.

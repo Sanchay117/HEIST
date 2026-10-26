@@ -4,11 +4,12 @@ import argparse, functools, json, math, subprocess, textwrap, sys
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
+from production import ROOT, OUT, PROJECT as P, EXPORT_NAME
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'artifacts/heist-demo/python-deps'))
 from fontTools.ttLib import TTFont
 
-ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'artifacts/heist-demo';SRC=Path(__file__).parent
-P=json.loads((SRC/'project.json').read_text());W,H=P['width'],P['height'];FPS=P['fps']
+SRC=Path(__file__).parent
+W,H=P['width'],P['height'];FPS=P['fps']
 CAP=json.loads((OUT/('capture.json' if (OUT/'capture.json').exists() else 'capture-progress.json')).read_text())
 ORANGE='#ff7950';WHITE='#e9eee6';MUTED='#a1ac9c';GREEN='#b5d58d';BG='#0c120f'
 ROLES=[('cipher','CIPHER','INTERCEPTED SIGNALS','#b5d58d'),('architect','ARCHITECT','BLUEPRINTS & ROUTES','#e1c392'),('lookout','LOOKOUT','EYES ON THE INSIDE','#a4c6bb')]
@@ -70,7 +71,7 @@ CAPTIONS=json.loads((OUT/'captions.json').read_text()) if (OUT/'captions.json').
 
 def header(im,s,t):
     txt(im,(48,25),'HEIST',52,kind='display');txt(im,(197,46),'OP / 001',18,MUTED,'mono')
-    label='SIMULATED TWITCH / IDENTITY CHECK' if s['style']=='pairing' else 'SOURCE + EXECUTED CHECKS' if s['style']=='codex' else 'LOCAL REHEARSAL / AUTOMATED CREW'
+    label='REAL TWITCH / BROADCASTER ACCOUNT TEST' if s['style']=='live-check' else 'SIMULATED TWITCH / IDENTITY CHECK' if s['style']=='pairing' else 'SOURCE + EXECUTED CHECKS' if s['style']=='codex' else 'LOCAL REHEARSAL / AUTOMATED CREW'
     txt(im,(1872,43),label,18,ORANGE if s['style']=='pairing' else MUTED,'mono','ra')
     d=ImageDraw.Draw(im);d.line((48,94,1872,94),fill='#35402f',width=2);d.line((48,94,48+1824*t/P['duration'],94),fill=ORANGE,width=3)
     if s['style'] not in ('opening','outro'):
@@ -109,7 +110,7 @@ def render_scene(s,u):
         txt(im,(960,566),'THE MERIDIAN JOB' if style=='opening' else 'TRUST YOUR CREW.',30,ORANGE,'mono','mt')
         txt(im,(960,650),'THE STREAMER HAS THE CONTROLS.',34,WHITE,'sans','mt')
         txt(im,(960,701),'CHAT HAS THE BLUEPRINTS.',34,WHITE,'sans','mt')
-        if style=='outro':txt(im,(960,830),'REHEARSAL CUT / REAL TWITCH CAPTURE PENDING',22,MUTED,'mono','mt')
+        if style=='outro':txt(im,(960,830),P.get('outro_disclosure','REHEARSAL CUT / REAL TWITCH CAPTURE PENDING'),22,MUTED,'mono','mt')
         d.line((720,620,1200,620),fill=ORANGE,width=2)
     elif style=='briefing':
         source=footage('host',marktime('missionStart')+u*.55,'host-lock')
@@ -154,6 +155,25 @@ def render_scene(s,u):
         paste(im,src,(670,240,1870,950),crop=(150,145,960,850))
         txt(im,(75,893),'LOCAL IDENTITY TEST',21,ORANGE,'mono')
         txt(im,(75,925),'REAL TWITCH CAPTURE PENDING',18,MUTED,'mono')
+    elif style=='live-check':
+        if 'live-chat' not in VIDEOS:VIDEOS['live-chat']=Video(OUT/'live-evidence/footage/vote-chat.mp4')
+        actual=VIDEOS['live-chat'].frame(min(u,13.5))
+        txt(im,(65,250),'ACTUAL TWITCH CHAT / HUMAN ACCOUNT',22,ORANGE,'mono')
+        box(im,(55,294,1865,511),fill='#151515',outline='#76533f')
+        crop=(0,205,1120,275) if u<4.3 else (0,274,1120,337)
+        paste(im,actual,(65,306,1855,500),crop=crop)
+        txt(im,(65,536),'ACTUAL GAME COMMS / SAME CIPHER',21,MUTED,'mono')
+        game=Image.open(OUT/'live-evidence/game-vote-comms.png').convert('RGB')
+        box(im,(55,576,958,947),fill='#111710')
+        paste(im,game,(75,591,938,931),crop=(945,543,1230,706))
+        box(im,(995,576,1865,947),fill='#131c11',outline='#657149')
+        txt(im,(1030,600),'VERIFIED SERVER STATE',21,GREEN,'mono')
+        txt(im,(1030,657),'1234',68,'#6d7765','mono')
+        draw=ImageDraw.Draw(im);draw.line((1030,703,1198,703),fill=ORANGE,width=4)
+        draw.line((1232,698,1322,698),fill=ORANGE,width=3);draw.line((1309,687,1322,698,1309,709),fill=ORANGE,width=3)
+        txt(im,(1360,657),'5678',68,WHITE,'mono')
+        txt(im,(1030,756),'01',110,GREEN,'mono');txt(im,(1220,798),'FINAL VOTE',44,WHITE,'display')
+        txt(im,(1034,898),'ONE ACCOUNT / ONE ROLE',21,MUTED,'mono')
     elif style=='escape':
         for i,role in enumerate(ROLES):role_card(im,role,i,u,stage='exit',y=335,w=550)
         ring=CAP.get('escape',{}).get('ring',['iris','echo','nova']);slot=CAP.get('escape',{}).get('slot',1);shift=CAP.get('escape',{}).get('shift',1)
@@ -182,7 +202,7 @@ def render_scene(s,u):
             txt(im,(1190,y),n,110,GREEN,'mono');txt(im,(1195,y+125),desc,21,MUTED,'mono')
         txt(im,(1195,793),'npm test: 29 pass / 0 fail',21,WHITE,'mono')
         txt(im,(1195,837),'GIT bc9cc99 / PAIRING FIX',19,MUTED,'mono')
-        txt(im,(1195,875),'REAL TWITCH STILL PENDING',19,ORANGE,'mono')
+        txt(im,(1195,875),P.get('codex_evidence_label','REAL TWITCH STILL PENDING'),19,ORANGE,'mono')
     header(im,s,t)
     # A restrained camera-shutter transition, with no rapid flashes.
     fade=min(1,u/.35,(duration-u)/.3)
@@ -194,7 +214,7 @@ def thumb():
     # Dark editorial panel keeps the title readable at thumbnail size.
     overlay=Image.new('RGBA',(W,H),(0,0,0,0));od=ImageDraw.Draw(overlay);od.polygon([(0,0),(1120,0),(880,H),(0,H)],fill=(9,17,11,245));im=Image.alpha_composite(im.convert('RGBA'),overlay).convert('RGB')
     txt(im,(95,130),'HEIST',230,WHITE,'display');txt(im,(105,407),'THE STREAMER HAS',50,WHITE,'display');txt(im,(105,468),'THE CONTROLS.',65,ORANGE,'display');txt(im,(105,576),'CHAT HAS',50,WHITE,'display');txt(im,(105,637),'THE BLUEPRINTS.',65,ORANGE,'display')
-    box(im,(100,862,665,930),fill='#252a1c',outline='#657149');txt(im,(125,882),'CINEMATIC REHEARSAL DEMO',24,GREEN,'mono')
+    box(im,(100,862,665,930),fill='#252a1c',outline='#657149');txt(im,(125,882),P.get('thumbnail_badge','CINEMATIC REHEARSAL DEMO'),24,GREEN,'mono')
     im.save(OUT/'exports/HEIST-Thumbnail.png');im.resize((1280,720),Image.Resampling.LANCZOS).save(OUT/'exports/HEIST-Thumbnail.jpg',quality=95)
 
 def main():
@@ -215,7 +235,7 @@ def main():
         print(f"Rendered scene {s['id']} / {s['style']}",flush=True)
     if not args.scene:
         listing=OUT/'exports/concat.txt';listing.write_text('\n'.join(f"file 'scenes/scene_{s['id']}.mp4'" for s in P['scenes']))
-        dest=OUT/'exports/HEIST-Rehearsal-Demo.mp4'
-        subprocess.run(['ffmpeg','-v','error','-y','-f','concat','-safe','0','-i',str(listing),'-i',str(OUT/'audio/final-mix.wav'),'-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','192k','-ar','48000','-t',str(P['duration']),'-map_metadata','-1','-metadata','title=HEIST — The Meridian Job (Rehearsal Cut)','-movflags','+faststart',str(dest)],check=True)
+        dest=OUT/'exports'/EXPORT_NAME
+        subprocess.run(['ffmpeg','-v','error','-y','-f','concat','-safe','0','-i',str(listing),'-i',str(OUT/'audio/final-mix.wav'),'-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','192k','-ar','48000','-t',str(P['duration']),'-map_metadata','-1','-metadata',f"title={P['title']} ({P['version']})",'-movflags','+faststart',str(dest)],check=True)
         print(f'Exported {dest}',flush=True)
 if __name__=='__main__':main()
